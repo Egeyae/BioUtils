@@ -42,24 +42,51 @@ class Sequence:
         while i < len(data):
             if data[i].startswith('SEQRES'):
                 break
+            i += 1
 
         j = i
         while j < len(data):
             if not data[j].startswith('SEQRES'):
                 break
+            j += 1
 
-        for
+        curr_chainid = data[i][11]
+        while i < j:
+            if curr_chainid != data[i][11]:
+                self.seq += "/"
+                curr_chainid = data[i][11]
+            s = data[i][19:]
+            s = map(toSingleLetter, s.strip().split())
+            self.seq += "".join(s)
+            i += 1
 
-    def __init__(self, data):
-        self.input_type = Sequence.find_input_type(data)
-        self.data_type = Sequence.find_data_type(data)
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        return self.seq
+
+    def save_to_file(self, filepath):
+        if self.outtype == "fasta":
+            s = f">{self.info}\n{self.seq}"
+        else:
+            s = self.seq
+        print(s, self.outtype)
+        with open(filepath, "w") as f:
+            f.write(s)
+
+    def __init__(self, data, outtype="raw"):
         self.info = ""
         self.seq = ""
+        self.outtype = outtype
+        if data:
+            self.input_type = Sequence.find_input_type(data)
+            self.data_type = Sequence.find_data_type(data)
 
-        match self.input_type:
-            case "fasta":
-                self.load_from_fasta(data)
-            case "pdb":
-                self.load_from_pdb(data)
-            case "seq":
-                self.seq = data.upper()
+            match self.input_type:
+                case "fasta":
+                    self.load_from_fasta(data)
+                case "pdb":
+                    self.load_from_pdb(data)
+                case "seq":
+                    self.seq = data.upper()

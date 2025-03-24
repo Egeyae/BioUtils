@@ -14,6 +14,7 @@ def _convert(r, col):
             return l[col]
 
 
+
 def toSingleLetter(residue):
     return _convert(residue, 1)
 
