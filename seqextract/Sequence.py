@@ -17,16 +17,11 @@ class Sequence:
         else:
             return "seq"
 
-    @staticmethod
-    def find_data_type(data):
-        # TODO: guess if it is DNA, RNA if possible OR Residues
-        return "residues"
-
     def load_from_fasta(self, data):
         data = data.split('\n')
 
         # TODO: better extraction of information from fasta
-        self.info = data[0]
+        self.info = data[0][1:]
 
         self.seq = "".join(data[1:]).replace('\n', '')
 
@@ -71,17 +66,20 @@ class Sequence:
             s = f">{self.info}\n{self.seq}"
         else:
             s = self.seq
-        print(s, self.outtype)
         with open(filepath, "w") as f:
             f.write(s)
 
-    def __init__(self, data, outtype="raw"):
+    def __init__(self, data, outtype="raw", seqtype="p"):
         self.info = ""
         self.seq = ""
+
+        self.input_type = None
+        self.data_type = None
+
         self.outtype = outtype
         if data:
             self.input_type = Sequence.find_input_type(data)
-            self.data_type = Sequence.find_data_type(data)
+            self.data_type = seqtype
 
             match self.input_type:
                 case "fasta":

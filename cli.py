@@ -1,46 +1,69 @@
 import argparse
+import sys
 
 main_parser = argparse.ArgumentParser(
     prog="BioUtils CLI",
     description="Various bioinformatics utilities: seq (sequence extraction)",
 )
-main_parser.add_argument(
-    "tool",
-    help="The tool that will be executed: seq",
-)
 
-main_parser.add_argument(
+subparsers = main_parser.add_subparsers(dest="tool", required=True)
+
+seq_parser = subparsers.add_parser("seq", help="Extract sequences from an input file or string")
+
+seq_parser.add_argument(
     "-i", "--input-file",
     help="The input file. Has priority over input string.",
     default=None,
 )
 
-main_parser.add_argument(
+seq_parser.add_argument(
     "-is", "--input-string",
     help="Instead of a file, directly provide a string",
     default="",
 )
 
-main_parser.add_argument(
+seq_parser.add_argument(
     "-o", "--output",
     help="The output file",
     default=None,
 )
 
-main_parser.add_argument(
+seq_parser.add_argument(
     "-ot", "--output-type",
     help="The type of the output, can be raw or fasta (raw by default)",
-    default="raw")
+    choices=["raw", "fasta"],
+    default="raw",
+)
 
-main_parser.add_argument(
+seq_parser.add_argument(
+    "-of", "--output-format",
+    help="The output format, can be ol (one line), w<n>(.<s>) (wrap every n with separator s, s is optional)",
+    default="fasta",
+)
+
+seq_parser.add_argument(
     "--hide-output",
     default=False,
     action="store_true",
     help="Hide the output in the terminal",
 )
 
+seq_type_group = seq_parser.add_mutually_exclusive_group()
+
+seq_type_group.add_argument(
+    '-p', '--protein',
+    action='store_const', dest='seq_type', const='p',
+    help="Define the sequence type, can be dna or protein (protein by default)"
+)
+
+seq_type_group.add_argument('-d', '--dna', 
+    action='store_const', dest='seq_type', const='d'
+)
+
+seq_parser.set_defaults(seq_type='p')
+
+
 args = main_parser.parse_args()
-tool = args.tool
 
 if args.input_file:
     with open(args.input_file, "r") as f:
@@ -48,10 +71,11 @@ if args.input_file:
 elif args.input_string:
     in_ = args.input_string
 else:
-    in_ = None
+    print("No input provided, can not proceed")
+    sys.exit(1)
 
-match tool:
+match args.tool:
     case "seq":
         from seqextract import *
 
-        run(in_, output_file=args.output, output_type=args.output_type, noprint=args.hide_output)
+        run(in_, output_file=args.output, output_type=args.output_type, noprint=args.hide_output, seq_type=args.seq_type)
