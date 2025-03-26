@@ -63,6 +63,33 @@ seq_type_group.add_argument('-d', '--dna',
 seq_parser.set_defaults(seq_type='p')
 
 
+hydrophob_parser = subparsers.add_parser("hydrophob", help="Generates hydrophobicity profile of a protein sequence")
+
+hydrophob_parser.add_argument(
+    "-i", "--input-file",
+    help="The input file. Has priority over input string.",
+    default=None,
+)
+
+hydrophob_parser.add_argument(
+    "-is", "--input-string",
+    help="Instead of a file, directly provide a string",
+    default="",
+)
+
+hydrophob_parser.add_argument(
+    "-o", "--output",
+    help="The output file",
+    default=None,
+)
+
+hydrophob_parser.add_argument(
+    "--show",
+    default=False,
+    action="store_true",
+    help="Show directly the generated graph, disabled by default",
+)
+
 args = main_parser.parse_args()
 
 if args.input_file:
@@ -79,3 +106,8 @@ match args.tool:
         from seqextract import *
 
         run(in_, output_file=args.output, output_type=args.output_type, noprint=args.hide_output, seq_type=args.seq_type)
+
+    case "hydrophob":
+        from hydrophob import *
+
+        run(in_, output_file=args.output, show=args.show)
