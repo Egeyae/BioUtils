@@ -1,9 +1,10 @@
 import argparse
 import sys
+import scales
 
 main_parser = argparse.ArgumentParser(
     prog="BioUtils CLI",
-    description="Various bioinformatics utilities: seq (sequence extraction)",
+    description="Various bioinformatics utilities",
 )
 
 subparsers = main_parser.add_subparsers(dest="tool", required=True)
@@ -90,16 +91,33 @@ hydrophob_parser.add_argument(
     help="Show directly the generated graph, disabled by default",
 )
 
+hydrophob_parser.add_argument(
+    '-s', '--scale',
+    default=scales.get_scale_ids()[0],
+    choices=scales.get_scale_ids(),
+    help="The scale to use",
+)
+
+scales_parser = subparsers.add_parser("scales", help="Manage scales")
+
+scales_parser.add_argument(
+    '-l', '--list',
+    action='store_true',
+    help="List available scales",
+    default=False
+)
+
 args = main_parser.parse_args()
 
-if args.input_file:
-    with open(args.input_file, "r") as f:
-        in_ = f.read()
-elif args.input_string:
-    in_ = args.input_string
-else:
-    print("No input provided, can not proceed")
-    sys.exit(1)
+if args.tool in ("seq", "hydrophob"):
+    if args.input_file:
+        with open(args.input_file, "r") as f:
+            in_ = f.read()
+    elif args.input_string:
+        in_ = args.input_string
+    else:
+        print("No input provided, can not proceed")
+        sys.exit(1)
 
 match args.tool:
     case "seq":
@@ -110,4 +128,8 @@ match args.tool:
     case "hydrophob":
         from hydrophob import *
 
-        run(in_, output_file=args.output, show=args.show)
+        run(in_, output_file=args.output, show=args.show, scale=args.scale)
+
+    case "scales":
+        if args.list:
+            scales.show_scales()
