@@ -1,6 +1,7 @@
 import argparse
 import sys
 import scales
+from scales import load_scale, get_scale_name
 
 main_parser = argparse.ArgumentParser(
     prog="BioUtils CLI",
@@ -98,6 +99,13 @@ hydrophob_parser.add_argument(
     help="The scale to use",
 )
 
+hydrophob_parser.add_argument(
+    '-w', '--window-size',
+    type=int,
+    help="The window size to use",
+    default=3,
+)
+
 scales_parser = subparsers.add_parser("scales", help="Manage scales")
 
 scales_parser.add_argument(
@@ -128,7 +136,10 @@ match args.tool:
     case "hydrophob":
         from hydrophob import *
 
-        run(in_, output_file=args.output, show=args.show, scale=args.scale)
+        if not args.window_size % 2 == 1:
+            print("Window size must be odd", file=sys.stderr)
+            sys.exit(1)
+        run(in_, output_file=args.output, show=args.show, scale_values=load_scale(args.scale), window=args.window_size, scale=get_scale_name(args.scale))
 
     case "scales":
         if args.list:

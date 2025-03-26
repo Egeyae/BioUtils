@@ -22,6 +22,13 @@ def load_scale(scale_id):
     return scale
 
 
+def get_scale_name(scale_id):
+    scales = get_all_scales()
+    if scale_id not in scales.keys():
+        return 'Unknown Scale'
+    return scales[scale_id]["name"]
+
+
 def get_scale_ids():
     all_scales = get_all_scales()
     ids = list(all_scales.keys())[1:]
