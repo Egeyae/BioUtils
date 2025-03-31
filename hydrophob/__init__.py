@@ -1,22 +1,6 @@
-from seqextract.Sequence import Sequence
 import matplotlib.pyplot as plt
-
-
-def compute_profile(seq, scale, window):
-    profile = []
-
-    residues = seq.get_sequence()
-    size = len(residues)
-
-    for i in range(size):
-        score = 0
-        n = 0
-        for j in range(-window//2, window//2+1, 1):
-            if 0 <= i+j < size:
-                score += scale[residues[i+j]]
-                n += 1
-        profile.append(score/n)
-    return profile
+from os import system
+from hydrophob.utils import compute_profile
 
 
 def run(data, output_file=None, show=True, scale_values=None, window=3, scale=None):
@@ -34,3 +18,6 @@ def run(data, output_file=None, show=True, scale_values=None, window=3, scale=No
         plt.savefig(output_file)
     if show:
         plt.show()
+
+def gui():
+    system("PYTHONPATH=$(pwd) streamlit run hydrophob/interface.py")

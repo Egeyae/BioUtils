@@ -106,6 +106,13 @@ hydrophob_parser.add_argument(
     default=3,
 )
 
+hydrophob_parser.add_argument(
+    '-gui', '--interface',
+    action='store_true',
+    default=False,
+    help="Run with a graphic user interface, adds other options as launch params on the interface"
+)
+
 scales_parser = subparsers.add_parser("scales", help="Manage scales")
 
 scales_parser.add_argument(
@@ -118,14 +125,15 @@ scales_parser.add_argument(
 args = main_parser.parse_args()
 
 if args.tool in ("seq", "hydrophob"):
-    if args.input_file:
-        with open(args.input_file, "r") as f:
-            in_ = f.read()
-    elif args.input_string:
-        in_ = args.input_string
-    else:
-        print("No input provided, can not proceed")
-        sys.exit(1)
+    if not args.tool == "hydrophob" and args.interface:
+        if args.input_file:
+            with open(args.input_file, "r") as f:
+                in_ = f.read()
+        elif args.input_string:
+            in_ = args.input_string
+        else:
+            print("No input provided, can not proceed")
+            sys.exit(1)
 
 match args.tool:
     case "seq":
@@ -136,10 +144,13 @@ match args.tool:
     case "hydrophob":
         from hydrophob import *
 
-        if not args.window_size % 2 == 1:
-            print("Window size must be odd", file=sys.stderr)
-            sys.exit(1)
-        run(in_, output_file=args.output, show=args.show, scale_values=load_scale(args.scale), window=args.window_size, scale=get_scale_name(args.scale))
+        if args.interface:
+            gui()
+        else:
+            if not args.window_size % 2 == 1:
+                print("Window size must be odd", file=sys.stderr)
+                sys.exit(1)
+            run(in_, output_file=args.output, show=args.show, scale_values=load_scale(args.scale), window=args.window_size, scale=get_scale_name(args.scale))
 
     case "scales":
         if args.list:
