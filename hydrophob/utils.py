@@ -1,13 +1,12 @@
 def compute_profile(seq, scale, window):
-    profile = []
+    profile = [None for _ in range(window//2)]
     residues = seq.get_sequence()
     size = len(residues)
-    for i in range(size):
+    for i in range(window//2, size-window//2):
         score = 0
-        n = 0
         for j in range(-window//2, window//2+1, 1):
-            if 0 <= i+j < size:
-                score += scale.get(residues[i+j], 0)
-                n += 1
-        profile.append(score / n if n > 0 else 0)
+            score += scale.get(residues[i+j], 0)
+        profile.append(score / window)
+
+    profile.extend([None for _ in range(window//2)])
     return profile

@@ -7,13 +7,13 @@ from scales import get_scale_name, get_scale_ids, load_scale, get_all_scales
 
 st.set_page_config(page_title="Hydrophob", layout="wide")
 
-st.markdown(
-    """
-    <style>
-    .main {background-color: #f9f9f9; padding: 20px; border-radius: 8px;}
-    .sidebar .sidebar-content {background-color: #f0f2f6; padding: 20px; border-radius: 8px;}
-    </style>
-    """, unsafe_allow_html=True)
+# st.markdown(
+#     """
+#     <style>
+#     .main {background-color: #f9f9f9; padding: 20px; border-radius: 8px;}
+#     .sidebar .sidebar-content {background-color: #f0f2f6; padding: 20px; border-radius: 8px;}
+#     </style>
+#     """, unsafe_allow_html=True)
 
 st.title("Hydrophob - Hydrophobic Profile Generator")
 
