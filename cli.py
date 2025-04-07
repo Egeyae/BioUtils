@@ -124,20 +124,90 @@ scales_parser.add_argument(
 
 dotplot_parser = subparsers.add_parser("dotplot", help="Dotplot graph")
 
+dotplot_parser.add_argument(
+    "-ia", "--input-file-a",
+    help="The input file for sequence A. Has priority over input string A.",
+    default=None,
+)
+
+dotplot_parser.add_argument(
+    "-isa", "--input-string-a",
+    help="Instead of a file, directly provide a string for sequence A",
+    default="",
+)
+
+dotplot_parser.add_argument(
+    "-ib", "--input-file-b",
+    help="The input file for sequence B. Has priority over input string B.",
+    default=None,
+)
+
+dotplot_parser.add_argument(
+    "-isb", "--input-string-b",
+    help="Instead of a file, directly provide a string for sequence B",
+    default="",
+)
+
+dotplot_parser.add_argument(
+    "-o", "--output",
+    help="The output file",
+    default=None,
+)
+
+dotplot_parser.add_argument(
+    "--show",
+    default=False,
+    action="store_true",
+    help="Show directly the generated graph, disabled by default",
+)
+
+dotplot_parser.add_argument(
+    '-w', '--window-size',
+    type=int,
+    help="The window size to use",
+    default=1,
+)
+
+dotplot_parser.add_argument(
+    "-ov", "--overlap",
+    action="store_true",
+    default=False,
+    help="Create a dotplot with overlap, false by default"
+)
+
 
 
 args = main_parser.parse_args()
 in_ = None
-if args.tool in ("seq", "hydrophob"):
+if args.tool in ("seq", "hydrophob", "dotplot"):
     if not (args.tool == "hydrophob" and args.interface):
-        if args.input_file:
-            with open(args.input_file, "r") as f:
-                in_ = f.read()
-        elif args.input_string:
-            in_ = args.input_string
+        if args.tool == "dotplot":
+            if args.input_file_a:
+                with open(args.input_file_a, "r") as f:
+                    in_a = f.read()
+            elif args.input_string_a:
+                in_a = args.input_string_a
+            else:
+                print("No sequence A provided, can not proceed", file=sys.stderr)
+                sys.exit(1)
+
+            if args.input_file_b:
+                with open(args.input_file_b, "r") as f:
+                    in_b = f.read()
+            elif args.input_string_b:
+                in_b = args.input_string_b
+            else:
+                print("No sequence B provided, can not proceed", file=sys.stderr)
+                sys.exit(1)
         else:
-            print("No input provided, can not proceed")
-            sys.exit(1)
+            if args.input_file:
+                with open(args.input_file, "r") as f:
+                    in_ = f.read()
+            elif args.input_string:
+                in_ = args.input_string
+            else:
+                print("No input provided, can not proceed", file=sys.stderr)
+                sys.exit(1)
 
 match args.tool:
     case "seq":
@@ -159,3 +229,9 @@ match args.tool:
     case "scales":
         if args.list:
             scales.show_scales()
+
+    case "dotplot":
+        from dotplot import *
+
+        run(in_a, in_b, output_file=args.output, show=args.show, window=args.window_size, overlap=args.overlap)
+

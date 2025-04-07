@@ -90,4 +90,4 @@ class Sequence:
                 case "pdb":
                     self.load_from_pdb(data)
                 case "seq":
-                    self._sequence = data.upper()
+                    self._sequence = data.upper().replace("\n", "")
