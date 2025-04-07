@@ -122,10 +122,14 @@ scales_parser.add_argument(
     default=False
 )
 
-args = main_parser.parse_args()
+dotplot_parser = subparsers.add_parser("dotplot", help="Dotplot graph")
 
+
+
+args = main_parser.parse_args()
+in_ = None
 if args.tool in ("seq", "hydrophob"):
-    if not args.tool == "hydrophob" and args.interface:
+    if not (args.tool == "hydrophob" and args.interface):
         if args.input_file:
             with open(args.input_file, "r") as f:
                 in_ = f.read()

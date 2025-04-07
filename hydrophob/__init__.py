@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from os import system
 from hydrophob.utils import compute_profile
-
+from seqextract import Sequence
 
 def run(data, output_file=None, show=True, scale_values=None, window=3, scale=None):
     seq = Sequence(data, outtype='raw', seqtype='p')
