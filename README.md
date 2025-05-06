@@ -18,7 +18,8 @@ General usage is: `python3 cli.py <tool> [tool options]`
 
 ### Installation
 
-Here we detail how to install the tool as a system-wide tool on Linux
+Here we detail how to install the tool as a system-wide tool on Linux.
+
 The install.sh file take care of the virtualenv + requirements installation too.
 ```shell
 sudo ./install.sh
