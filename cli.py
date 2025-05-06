@@ -1,5 +1,6 @@
 import argparse
 import sys
+from os import system
 import scales
 from scales import load_scale, get_scale_name
 
@@ -9,6 +10,8 @@ main_parser = argparse.ArgumentParser(
 )
 
 subparsers = main_parser.add_subparsers(dest="tool", required=True)
+
+gui_parser = subparsers.add_parser("gui", help="Run the various tools in a web interface")
 
 seq_parser = subparsers.add_parser("seq", help="Extract sequences from an input file or string")
 
@@ -106,13 +109,6 @@ hydrophob_parser.add_argument(
     default=3,
 )
 
-hydrophob_parser.add_argument(
-    '-gui', '--interface',
-    action='store_true',
-    default=False,
-    help="Run with a graphic user interface, adds other options as launch params on the interface"
-)
-
 scales_parser = subparsers.add_parser("scales", help="Manage scales")
 
 scales_parser.add_argument(
@@ -180,34 +176,33 @@ dotplot_parser.add_argument(
 args = main_parser.parse_args()
 in_ = None
 if args.tool in ("seq", "hydrophob", "dotplot"):
-    if not (args.tool == "hydrophob" and args.interface):
-        if args.tool == "dotplot":
-            if args.input_file_a:
-                with open(args.input_file_a, "r") as f:
-                    in_a = f.read()
-            elif args.input_string_a:
-                in_a = args.input_string_a
-            else:
-                print("No sequence A provided, can not proceed", file=sys.stderr)
-                sys.exit(1)
-
-            if args.input_file_b:
-                with open(args.input_file_b, "r") as f:
-                    in_b = f.read()
-            elif args.input_string_b:
-                in_b = args.input_string_b
-            else:
-                print("No sequence B provided, can not proceed", file=sys.stderr)
-                sys.exit(1)
+    if args.tool == "dotplot":
+        if args.input_file_a:
+            with open(args.input_file_a, "r") as f:
+                in_a = f.read()
+        elif args.input_string_a:
+            in_a = args.input_string_a
         else:
-            if args.input_file:
-                with open(args.input_file, "r") as f:
-                    in_ = f.read()
-            elif args.input_string:
-                in_ = args.input_string
-            else:
-                print("No input provided, can not proceed", file=sys.stderr)
-                sys.exit(1)
+            print("No sequence A provided, can not proceed", file=sys.stderr)
+            sys.exit(1)
+
+        if args.input_file_b:
+            with open(args.input_file_b, "r") as f:
+                in_b = f.read()
+        elif args.input_string_b:
+            in_b = args.input_string_b
+        else:
+            print("No sequence B provided, can not proceed", file=sys.stderr)
+            sys.exit(1)
+    else:
+        if args.input_file:
+            with open(args.input_file, "r") as f:
+                in_ = f.read()
+        elif args.input_string:
+            in_ = args.input_string
+        else:
+            print("No input provided, can not proceed", file=sys.stderr)
+            sys.exit(1)
 
 match args.tool:
     case "seq":
@@ -218,13 +213,10 @@ match args.tool:
     case "hydrophob":
         from hydrophob import *
 
-        if args.interface:
-            gui()
-        else:
-            if not args.window_size % 2 == 1:
-                print("Window size must be odd", file=sys.stderr)
-                sys.exit(1)
-            run(in_, output_file=args.output, show=args.show, scale_values=load_scale(args.scale), window=args.window_size, scale=get_scale_name(args.scale))
+        if not args.window_size % 2 == 1:
+            print("Window size must be odd", file=sys.stderr)
+            sys.exit(1)
+        run(in_, output_file=args.output, show=args.show, scale_values=load_scale(args.scale), window=args.window_size, scale=get_scale_name(args.scale))
 
     case "scales":
         if args.list:
@@ -234,4 +226,7 @@ match args.tool:
         from dotplot import *
 
         run(in_a, in_b, output_file=args.output, show=args.show, window=args.window_size, overlap=args.overlap)
+
+    case "gui":
+        system("PYTHONPATH=$(pwd) streamlit run Main.py")
 

@@ -18,6 +18,3 @@ def run(data, output_file=None, show=True, scale_values=None, window=3, scale=No
         plt.savefig(output_file)
     if show:
         plt.show()
-
-def gui():
-    system("PYTHONPATH=$(pwd) streamlit run hydrophob/interface.py")

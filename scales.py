@@ -1,4 +1,4 @@
-SEPARATOR = ',,'
+SEPARATOR = '~'
 PATH = "./data/scales.txt"
 SCALES_FOLDER = "./data/scales/"
 
@@ -12,6 +12,8 @@ def get_all_scales():
 
     return all_scales
 
+def get_scale_filename(scale_id):
+    return SCALES_FOLDER + scale_id + '.scale'
 
 def load_scale(scale_id):
     scale = {}
